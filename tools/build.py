@@ -19,16 +19,68 @@ def rel(p):
     return p.relative_to(SITE).as_posix()
 
 
+BUNDLE_SIZE = 4 * 1024 * 1024
+
+
+def pack_order(p):
+    """截图在前；底图按缩放级别，再按 quadkey（Z 序）排列，同一区域的底图落在同一个包里。"""
+    r = rel(p)
+    if not r.startswith("tiles/"):
+        return (0, 0, r)
+    _, _, z, name = r.split("/")
+    x, y = (int(v) for v in name.split(".")[0].split("_"))
+    qk = 0
+    for bit in range(int(z), -1, -1):
+        qk = (qk << 2) | (((y >> bit) & 1) << 1) | ((x >> bit) & 1)
+    return (1, int(z), qk)
+
+
+def write_bundles(files):
+    """把小文件拼接成约 4 MB 的包，手机下载几十次即可，而不是两万多次。
+    每个包记录 [路径, 偏移, 长度]；包名含内容哈希，内容不变则文件名不变。"""
+    out_dir = SITE / "pack"
+    out_dir.mkdir(exist_ok=True)
+    bundles, cur, size = [], [], 0
+    for p in files:
+        cur.append(p)
+        size += p.stat().st_size
+        if size >= BUNDLE_SIZE:
+            bundles.append(cur)
+            cur, size = [], 0
+    if cur:
+        bundles.append(cur)
+
+    meta, keep = [], set()
+    for group in bundles:
+        data, entries = bytearray(), []
+        for p in group:
+            b = p.read_bytes()
+            entries.append([rel(p), len(data), len(b)])
+            data += b
+        name = f"pack/{hashlib.sha256(data).hexdigest()[:16]}.bin"
+        keep.add(name)
+        target = SITE / name
+        if not target.exists():
+            target.write_bytes(data)
+        meta.append({"file": name, "bytes": len(data), "entries": entries})
+    for old in out_dir.glob("*.bin"):  # 删除不再使用的旧包
+        if rel(old) not in keep:
+            old.unlink()
+    return meta
+
+
 def main():
     compile_data.main()
 
-    pack = sorted(p for d in ("tiles", "media") for p in (SITE / d).rglob("*")
-                  if p.is_file() and not p.name.endswith(".part"))
+    pack = sorted((p for d in ("media", "tiles") for p in (SITE / d).rglob("*")
+                   if p.is_file() and not p.name.endswith(".part")), key=pack_order)
     pack_bytes = sum(p.stat().st_size for p in pack)
+    bundles = write_bundles(pack)
     (SITE / "data" / "offline-pack.json").write_text(
-        json.dumps({"files": [rel(p) for p in pack], "bytes": pack_bytes}, separators=(",", ":")),
+        json.dumps({"count": len(pack), "bytes": pack_bytes, "bundles": bundles},
+                   separators=(",", ":")),
         encoding="utf-8")
-    print(f"离线包：{len(pack)} 个文件，{pack_bytes / 1048576:.0f} MB")
+    print(f"离线包：{len(pack)} 个文件，{pack_bytes / 1048576:.0f} MB，合并为 {len(bundles)} 个包")
 
     shell = ["./", "index.html", "style.css", "app.js", "manifest.webmanifest",
              "data/map.json", "data/offline-pack.json"]

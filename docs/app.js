@@ -4,7 +4,7 @@
 
   const BASE = new URL('./', location.href).href;
   const STORE_KEY = 'gta6map.state.v1';
-  const PACK_CACHE = 'gta6map-pack-v1';
+  const BUNDLE_CACHE = 'gta6map-bundles-v1';
   const BOUNDS = [[-1.40625, 0], [0, 1.4061088354351563]];
   const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -336,7 +336,15 @@
   function closeMenu() { document.body.classList.remove('menu-open'); $('backdrop').hidden = true; $('menu-btn').setAttribute('aria-expanded', 'false'); }
 
   // ---------- 离线下载 ----------
+  // 离线包 = 约 30 个 4 MB 的大包，整包存进缓存；Service Worker 按需从包里切出底图/截图
   let pack = null, downloading = false;
+  const fmtMB = (n) => (n / 1048576).toFixed(0);
+
+  async function cachedBundles(cache) {
+    const urls = new Set((await cache.keys()).map((r) => r.url));
+    return pack.bundles.filter((b) => urls.has(BASE + b.file));
+  }
+
   async function initOffline() {
     const btn = $('offline-btn'), status = $('offline-status'), hint = $('offline-hint');
     if (!('serviceWorker' in navigator) || !('caches' in window)) {
@@ -348,22 +356,25 @@
     try { pack = await (await fetch('data/offline-pack.json')).json(); } catch (e) {
       status.textContent = '离线包清单加载失败，请联网后重试。'; return;
     }
-    const total = pack.files.length;
-    const cache = await caches.open(PACK_CACHE);
-    const have = new Set((await cache.keys()).map((r) => r.url));
-    const missing = pack.files.filter((p) => !have.has(BASE + p));
-    const mb = (pack.bytes / 1048576).toFixed(0);
+    const cache = await caches.open(BUNDLE_CACHE);
+    // 清理数据更新后不再使用的旧包
+    const wanted = new Set(pack.bundles.map((b) => BASE + b.file));
+    for (const req of await cache.keys()) if (!wanted.has(req.url)) await cache.delete(req);
+
+    const have = await cachedBundles(cache);
+    const haveBytes = have.reduce((a, b) => a + b.bytes, 0);
+    const total = pack.bytes;
     if (IS_IOS && !IS_STANDALONE) {
       hint.textContent = 'iPhone 提示：请先点 Safari 的分享按钮 →「添加到主屏幕」，然后从桌面图标打开再下载。在 Safari 里下载的离线数据，主屏幕 App 用不了。';
     }
-    if (!missing.length) {
-      status.textContent = `✓ 离线地图已全部下载（${total} 个文件，约 ${mb} MB），没网也能用。`;
+    if (have.length === pack.bundles.length) {
+      status.textContent = `✓ 离线地图已全部下载（约 ${fmtMB(total)} MB），没网也能用。`;
       btn.textContent = '重新检查'; btn.disabled = false;
     } else {
-      status.textContent = have.size
-        ? `已下载 ${total - missing.length} / ${total} 个文件，还差 ${missing.length} 个。`
-        : `离线包约 ${mb} MB（地图底图 + 截图），下载后没网也能查看地图。建议连 Wi-Fi 下载。`;
-      btn.textContent = have.size ? '继续下载' : `下载离线地图（约 ${mb} MB）`;
+      status.textContent = have.length
+        ? `已下载 ${fmtMB(haveBytes)} / ${fmtMB(total)} MB，点“继续下载”补全。`
+        : `离线包约 ${fmtMB(total)} MB（地图底图 + 截图），下载后没网也能查看地图。建议连 Wi-Fi 下载。`;
+      btn.textContent = have.length ? '继续下载' : `下载离线地图（约 ${fmtMB(total)} MB）`;
       btn.disabled = false;
     }
     btn.onclick = () => downloadPack(cache);
@@ -375,36 +386,42 @@
     const btn = $('offline-btn'), status = $('offline-status'), bar = $('offline-bar');
     btn.disabled = true; bar.parentElement.hidden = false;
     if (navigator.storage && navigator.storage.persist) { try { await navigator.storage.persist(); } catch (e) { /* 忽略 */ } }
-    const have = new Set((await cache.keys()).map((r) => r.url));
-    const todo = pack.files.filter((p) => !have.has(BASE + p));
-    const total = pack.files.length;
-    let done = total - todo.length, failed = 0, idx = 0;
+    const have = new Set((await cachedBundles(cache)).map((b) => b.file));
+    const todo = pack.bundles.filter((b) => !have.has(b.file));
+    const total = pack.bytes;
+    let done = pack.bundles.filter((b) => have.has(b.file)).reduce((a, b) => a + b.bytes, 0);
+    let failed = 0, idx = 0, fatal = null;
     const update = () => {
       bar.style.width = (done / total * 100).toFixed(1) + '%';
-      status.textContent = `正在下载… ${done} / ${total}${failed ? `（${failed} 个失败）` : ''}。请保持屏幕常亮、不要切出 App。`;
+      status.textContent = `正在下载… ${(done / total * 100).toFixed(0)}%（${fmtMB(done)} / ${fmtMB(total)} MB）${failed ? `，${failed} 个包失败` : ''}。请保持屏幕常亮、不要切出 App。`;
     };
     update();
     async function worker() {
-      while (idx < todo.length) {
-        const p = todo[idx++];
+      while (idx < todo.length && !fatal) {
+        const b = todo[idx++];
         try {
-          const r = await fetch(BASE + p, { cache: 'no-store' });
-          if (r.ok) await cache.put(BASE + p, r); else failed++;
-        } catch (e) { failed++; }
-        done++;
-        if (done % 25 === 0 || done === total) update();
+          const r = await fetch(BASE + b.file, { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const blob = await r.blob();
+          if (blob.size !== b.bytes) throw new Error('文件不完整');
+          await cache.put(BASE + b.file, new Response(blob, {
+            headers: { 'Content-Type': 'application/octet-stream', 'Content-Length': String(b.bytes) },
+          }));
+          done += b.bytes;
+          update();
+        } catch (e) {
+          if (e && e.name === 'QuotaExceededError') { fatal = e; break; }
+          failed++;
+          update();
+        }
       }
     }
-    try {
-      await Promise.all(Array.from({ length: 6 }, worker));
-    } catch (e) {
-      toast('下载中断：' + (e && e.name === 'QuotaExceededError' ? '手机存储空间不足' : e.message), 5000);
-    }
+    await Promise.all(Array.from({ length: 3 }, worker));
     downloading = false;
-    update();
-    if (failed) { status.textContent += ' 点击“继续下载”重试失败的文件。'; }
+    if (fatal) toast('下载中断：手机存储空间不足', 5000);
     await initOffline();
-    if (!failed) toast('离线地图下载完成 🎉');
+    if (failed) $('offline-status').textContent += `（${failed} 个包下载失败，请点“继续下载”重试）`;
+    else if (!fatal) toast('离线地图下载完成 🎉');
   }
 
   // ---------- 备份 ----------
