@@ -1,0 +1,16 @@
+{
+  "name": "GTA6 离线地图",
+  "short_name": "GTA6 地图",
+  "description": "GTA VI 雷奥尼达州中文互动地图，支持离线使用。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#211829",
+  "theme_color": "#211829",
+  "icons": [
+    { "src": "app-icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "app-icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "app-icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

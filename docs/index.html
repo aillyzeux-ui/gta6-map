@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>GTA6 离线地图</title>
+  <meta name="description" content="GTA VI 雷奥尼达州中文互动地图，支持离线使用。">
+  <meta name="theme-color" content="#211829">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GTA6 地图">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="app-icons/icon-192.png">
+  <link rel="apple-touch-icon" href="app-icons/icon-180.png">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="map" aria-label="地图"></div>
+
+  <button id="menu-btn" class="fab" type="button" aria-label="打开菜单" aria-expanded="false">☰</button>
+  <div id="backdrop" hidden></div>
+
+  <aside id="panel" aria-label="菜单">
+    <header class="panel-head">
+      <div>
+        <h1>GTA6 离线地图</h1>
+        <p class="sub">雷奥尼达州 · 中文版</p>
+      </div>
+      <button id="close-btn" class="icon-btn" type="button" aria-label="关闭菜单">✕</button>
+    </header>
+
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="搜索标记或分类" autocomplete="off" enterkeyhint="search">
+    </div>
+    <div id="results" hidden></div>
+
+    <div id="browse">
+      <div class="row-buttons">
+        <button type="button" id="show-all">全部显示</button>
+        <button type="button" id="hide-all">全部隐藏</button>
+      </div>
+      <div id="sections"></div>
+
+      <section class="settings">
+        <h2>设置</h2>
+        <label class="switch-row"><span>隐藏已收集</span><input type="checkbox" id="opt-hide-collected"></label>
+        <label class="switch-row"><span>显示区域名称</span><input type="checkbox" id="opt-labels" checked></label>
+        <label class="switch-row"><span>标记大小</span>
+          <select id="opt-size">
+            <option value="0.75">小</option>
+            <option value="1" selected>中</option>
+            <option value="1.3">大</option>
+          </select>
+        </label>
+
+        <h2>离线使用</h2>
+        <div id="offline">
+          <p id="offline-status">正在检查…</p>
+          <div class="progress" hidden><div id="offline-bar"></div></div>
+          <p id="offline-hint" class="muted"></p>
+          <div class="row-buttons">
+            <button type="button" id="offline-btn" class="primary" disabled>下载离线地图</button>
+          </div>
+        </div>
+
+        <h2>进度备份</h2>
+        <div class="row-buttons">
+          <button type="button" id="export-btn">导出进度</button>
+          <button type="button" id="import-btn">导入进度</button>
+        </div>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+        <button type="button" id="reset-btn" class="danger wide">清空收集进度</button>
+
+        <h2>关于</h2>
+        <p class="muted small">
+          标记数据、截图与原始界面来自
+          <a href="https://jeanropke.github.io/GTAVIMap/" target="_blank" rel="noopener">GTAVIMap</a>（Jean Ropke），经作者同意使用。
+          地图画面 © Rockstar Games。本站与 Rockstar Games、Take-Two Interactive 无关。
+          地图引擎：MapLibre GL JS（BSD-3-Clause）。
+        </p>
+        <p class="muted small" id="data-version"></p>
+      </section>
+    </div>
+  </aside>
+
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="vendor/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
