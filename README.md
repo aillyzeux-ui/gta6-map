@@ -44,9 +44,3 @@ git add -A && git commit -m "更新数据" && git push
 ```
 
 中文翻译放在同级目录 `../gtavimap-zh/`（zh-ui.json、zh-categories.json、zh-markers.json）。
-
-## 版权与致谢
-
-- 标记数据、截图与原始界面：[GTAVIMap](https://jeanropke.github.io/GTAVIMap/)（Jean Ropke），经作者同意使用
-- 地图画面 © Rockstar Games。本项目与 Rockstar Games、Take-Two Interactive 无关
-- 地图引擎：[MapLibre GL JS](https://maplibre.org/)（BSD-3-Clause，见 `docs/vendor/MAPLIBRE-LICENSE.txt`）
