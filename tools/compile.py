@@ -86,6 +86,8 @@ def main():
                     desc = None
                 else:
                     desc = t(dkey) or " ".join(filter(None, [t(f"base.{ckey}.desc"), t(f"base.{mi18n}.detail")]))
+                if desc and desc.strip() in (cat_name, c["key"], t(f"base.{ckey}.name")):
+                    desc = None  # 描述只是分类名（如帮派名），与分类行重复
                 pos = m.get("mapAnchor") or m
                 lng, lat = to_lnglat(pos["x"], pos["y"])
                 rows.append([lng, lat, s(name), s(hint), s(desc), s(m.get("screenshot")), mkey])

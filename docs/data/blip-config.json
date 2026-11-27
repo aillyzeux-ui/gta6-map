@@ -1,0 +1,326 @@
+{
+ "source": "GTAVIMap 图标合成配置（从原站提取）",
+ "backgroundScale": 0.875,
+ "foregroundColor": "#000000",
+ "colors": {
+  "shop": "#d9e6f9",
+  "activity": "#9eb6f4",
+  "apparel": "#ffdad5",
+  "robbery": "#77d777",
+  "collection": "#ffd464",
+  "garage": "#22e8cd",
+  "contact": "#b9e6b9",
+  "randy": "#51caf5",
+  "moses": "#e386b7",
+  "fishing": "#c6a0f7"
+ },
+ "icons": {
+  "ambrosia_raceway_blip": {
+   "sprite": "blip_activity_racing_track",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "ammu_nations_blip": {
+   "sprite": "blip_store_gun",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "animal_crackers_blip": {
+   "sprite": "blip_activity_racing_offroad",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "banks_blip": {
+   "sprite": "blip_location_bank",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "bars_blip": {
+   "sprite": "blip_store_bar",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "big_banks_blip": {
+   "sprite": "blip_location_bank_high_value",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "cafes_takeout_blip": {
+   "sprite": "blip_store_food_takeaway",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "car_washes_blip": {
+   "sprite": "blip_store_car_wash",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "casual_street_blip": {
+   "sprite": "blip_store_clothes",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "clubs_blip": {
+   "sprite": "blip_location_nightclub",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "contacts_blip": {
+   "sprite": "blip_location_donnie_trailer",
+   "background": "blip_location_bg",
+   "backgroundColor": "contact"
+  },
+  "convenience_stores_blip": {
+   "sprite": "blip_store_convenience",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "criminals_blip": {
+   "sprite": "blip_location_gang_hideout",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "delights_blip": {
+   "sprite": "delights_blip",
+   "foregroundColor": "collection"
+  },
+  "electronics_blip": {
+   "sprite": "blip_store_electronics",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "fast_food_blip": {
+   "sprite": "blip_store_food_takeaway",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "final_chapter_blip": {
+   "sprite": "blip_gang_final_chapter",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "fishing_hotspots_blip": {
+   "sprite": "fishing_hotspots_blip",
+   "foregroundColor": "fishing"
+  },
+  "footwear_blip": {
+   "sprite": "blip_store_shoe",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "formal_blip": {
+   "sprite": "blip_store_clothes_formal",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "garages_blip": {
+   "sprite": "blip_garage",
+   "background": "blip_location_bg",
+   "backgroundColor": "garage"
+  },
+  "gas_stations_blip": {
+   "sprite": "blip_store_gas_station",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "gellhorn_raceway_blip": {
+   "sprite": "blip_activity_racing_track",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "golf_courses_blip": {
+   "sprite": "blip_activity_golf",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "gyms_blip": {
+   "sprite": "blip_activity_gym",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "hair_beauty_blip": {
+   "sprite": "blip_store_barber",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "hamlet_boone_speedway_blip": {
+   "sprite": "blip_activity_racing_track",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "high_end_jewelry_stores_blip": {
+   "sprite": "blip_store_jewelry_high_value",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "hit_n_run_vc_blip": {
+   "sprite": "blip_activity_racing_street",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "hot_dog_stands_blip": {
+   "sprite": "blip_store_kiosk",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "ice_cream_blip": {
+   "sprite": "blip_store_ice_cream",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "jack_of_hearts_blip": {
+   "sprite": "jack_of_hearts_blip",
+   "foregroundColor": "collection"
+  },
+  "kingfishers_blip": {
+   "sprite": "blip_gang_kingfishers",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "kolt_associates_blip": {
+   "sprite": "blip_gang_kolts",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "la_polilla_negra_blip": {
+   "sprite": "blip_gang_pollilanegra",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "liquor_stores_blip": {
+   "sprite": "blip_store_liquor",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "low_end_jewelry_stores_blip": {
+   "sprite": "blip_store_jewelry",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "luxury_watches_blip": {
+   "sprite": "luxury_watches_blip",
+   "foregroundColor": "collection"
+  },
+  "m7_blip": {
+   "sprite": "blip_gang_m7",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "mini_golf_courses_blip": {
+   "sprite": "blip_activity_golf",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "mod_shops_blip": {
+   "sprite": "blip_store_mod_vehicle",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "moses_vehicles_blip": {
+   "sprite": "blip_ambient_car_sports",
+   "foregroundColor": "moses"
+  },
+  "nine1nine_blip": {
+   "sprite": "nine1nine_blip",
+   "foregroundColor": "collection"
+  },
+  "pawn_shops_blip": {
+   "sprite": "blip_store_pawn",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "pay_n_spray_blip": {
+   "sprite": "blip_store_paynspray",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "payday_loans_blip": {
+   "sprite": "blip_store_loans",
+   "background": "blip_gang_bg",
+   "backgroundColor": "robbery"
+  },
+  "ptt_youngin_blip": {
+   "sprite": "blip_gang_ptty",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "purchasable_garages_blip": {
+   "sprite": "blip_garage_purchased",
+   "background": "blip_location_bg",
+   "backgroundColor": "garage"
+  },
+  "racing_challenges_blip": {
+   "sprite": "blip_activity_racing_challenge",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "racing_introductions_blip": {
+   "sprite": "blip_activity_racing_track",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "randy_vehicles_blip": {
+   "sprite": "blip_car",
+   "foregroundColor": "randy"
+  },
+  "san4san_blip": {
+   "sprite": "blip_gang_san4san",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "shooting_ranges_blip": {
+   "sprite": "blip_activity_shooting_range",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "souvenir_swimwear_blip": {
+   "sprite": "blip_store_clothes_souvenir",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "sportswear_blip": {
+   "sprite": "blip_store_clothes_sports",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "standout_vehicles_blip": {
+   "sprite": "blip_car",
+   "foregroundColor": "collection"
+  },
+  "street_food_blip": {
+   "sprite": "blip_store_food_takeaway",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  },
+  "tattoos_blip": {
+   "sprite": "blip_store_tattoo",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "the_guardia_brothers_blip": {
+   "sprite": "blip_gang_guardiabrothers",
+   "background": "blip_gang_bg",
+   "backgroundColor": "collection"
+  },
+  "thrift_blip": {
+   "sprite": "blip_store_clothes_thrift",
+   "background": "blip_location_bg",
+   "backgroundColor": "apparel"
+  },
+  "thrillbilly_mud_club_blip": {
+   "sprite": "blip_activity_mudclub",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "top_fun_drones_blip": {
+   "sprite": "blip_activity_racing_drone",
+   "background": "blip_location_bg",
+   "backgroundColor": "activity"
+  },
+  "train_stations_blip": {
+   "sprite": "blip_location_train_station",
+   "background": "blip_location_bg",
+   "backgroundColor": "shop"
+  }
+ }
+}

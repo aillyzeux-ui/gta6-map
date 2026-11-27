@@ -83,7 +83,7 @@ def main():
     print(f"离线包：{len(pack)} 个文件，{pack_bytes / 1048576:.0f} MB，合并为 {len(bundles)} 个包")
 
     shell = ["./", "index.html", "style.css", "app.js", "manifest.webmanifest",
-             "data/map.json", "data/offline-pack.json"]
+             "data/map.json", "data/offline-pack.json", "data/blip-config.json"]
     for d in ("vendor", "icons", "app-icons"):
         shell += sorted(rel(p) for p in (SITE / d).glob("*") if p.is_file() and p.suffix in (".js", ".css", ".png"))
     missing = [s for s in shell if s != "./" and not (SITE / s).exists()]

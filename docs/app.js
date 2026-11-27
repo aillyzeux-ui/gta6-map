@@ -104,14 +104,71 @@
     return new Promise((resolve) => map.on('load', resolve));
   }
 
+  // ---------- 图标合成（与原站一致：按分类上色的底座 + 前景图案） ----------
+  const iconData = new Map(); // name -> { url, image }
+  const iconUrl = (name) => (iconData.get(name) || {}).url || ('icons/' + name + '.png');
+  const loadImg = (src) => new Promise((resolve, reject) => {
+    const i = new Image(); i.onload = () => resolve(i); i.onerror = () => reject(new Error(src)); i.src = src;
+  });
+  // 按亮度把图片染成指定颜色（保留透明度）
+  function tint(img, hex) {
+    const c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.drawImage(img, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height), px = d.data;
+    const rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    for (let i = 0; i < px.length; i += 4) {
+      const t = (px[i] + px[i + 1] + px[i + 2]) / 765;
+      px[i] = Math.round(rgb[0] * t); px[i + 1] = Math.round(rgb[1] * t); px[i + 2] = Math.round(rgb[2] * t);
+    }
+    x.putImageData(d, 0, 0);
+    return c;
+  }
+  async function composeIcon(name, cfg) {
+    const def = cfg && cfg.icons[name];
+    const color = (k) => (k ? (cfg.colors[k] || k) : null);
+    const isHex = (v) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+    let canvas;
+    if (!def) {
+      const img = await loadImg('icons/' + name + '.png');
+      canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+    } else {
+      const [fg, bg] = await Promise.all([
+        loadImg('icons/' + def.sprite + '.png'),
+        def.background ? loadImg('icons/' + def.background + '.png') : null,
+      ]);
+      canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 96;
+      const ctx = canvas.getContext('2d');
+      const scale = def.scale || (bg ? cfg.backgroundScale : 1);
+      const draw = (img, hex) => {
+        const src = isHex(hex) ? tint(img, hex) : img;
+        const w = 96 * scale;
+        ctx.drawImage(src, (96 - w) / 2, (96 - w) / 2, w, w);
+      };
+      if (bg) draw(bg, color(def.backgroundColor));
+      draw(fg, color(def.foregroundColor || (bg ? cfg.foregroundColor : null)));
+    }
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    iconData.set(name, {
+      url: def ? canvas.toDataURL() : null,
+      image: ctx.getImageData(0, 0, canvas.width, canvas.height),
+    });
+  }
+  async function prepareIcons() {
+    let cfg = null;
+    try { cfg = await (await fetch('data/blip-config.json')).json(); } catch (e) { console.warn('图标配置加载失败'); }
+    const names = [...new Set(DATA.cats.map((c) => c.icon))];
+    await Promise.all(names.map((n) => composeIcon(n, cfg)
+      .catch(() => composeIcon(n, null))            // 合成失败就用原始白色图标
+      .catch(() => console.warn('图标加载失败', n))));
+  }
+
   async function addMarkers() {
-    const icons = [...new Set(DATA.cats.map((c) => c.icon))];
-    await Promise.all(icons.map(async (name) => {
-      try {
-        const img = await map.loadImage(BASE + 'icons/' + name + '.png');
-        if (!map.hasImage(name)) map.addImage(name, img.data);
-      } catch (e) { console.warn('图标加载失败', name); }
-    }));
+    iconData.forEach((v, name) => { if (!map.hasImage(name)) map.addImage(name, v.image); });
     map.addSource('markers', { type: 'geojson', data: { type: 'FeatureCollection', features } });
     map.addLayer({
       id: 'markers', type: 'symbol', source: 'markers',
@@ -257,7 +314,7 @@
       const c = DATA.cats[ci];
       const row = document.createElement('label'); row.className = 'cat';
       const ccb = document.createElement('input'); ccb.type = 'checkbox';
-      const img = document.createElement('img'); img.src = 'icons/' + c.icon + '.png'; img.alt = ''; img.loading = 'lazy';
+      const img = document.createElement('img'); img.src = iconUrl(c.icon); img.alt = '';
       const nm = document.createElement('span'); nm.className = 'name'; nm.textContent = c.name;
       const cnt = document.createElement('span'); cnt.className = 'count';
       row.append(ccb, img, nm, cnt);
@@ -317,7 +374,7 @@
     hits.forEach((fid) => {
       const f = features[fid], c = DATA.cats[f.properties.c], m = c.markers[f.properties.m];
       const b = document.createElement('button'); b.type = 'button'; b.className = 'result';
-      b.innerHTML = `<img src="icons/${esc(c.icon)}.png" alt=""><span><span class="t">${esc(str(m[2]))}${state.collected[m[6]] ? ' ✓' : ''}</span><span class="s">${esc(c.name)}</span></span>`;
+      b.innerHTML = `<img src="${esc(iconUrl(c.icon))}" alt=""><span><span class="t">${esc(str(m[2]))}${state.collected[m[6]] ? ' ✓' : ''}</span><span class="s">${esc(c.name)}</span></span>`;
       b.addEventListener('click', () => focusFeature(fid));
       box.appendChild(b);
     });
@@ -474,6 +531,7 @@
       return;
     }
     $('data-version').textContent = `共 ${DATA.cats.length} 个分类、${features.length} 个标记。数据更新于 ${DATA.updated || '—'}。`;
+    await prepareIcons();
     renderMenu();
     await initMap();
     await addMarkers();
